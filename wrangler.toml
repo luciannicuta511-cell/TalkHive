@@ -1,0 +1,6 @@
+name = "talkhive"
+main = "worker.js"
+type = "service"
+
+[env.production]
+route = "talkhive1.luciannicuta511.workers.dev"

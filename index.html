@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalkHive — Chat social modern</title>
+    <meta
+      name="description"
+      content="Un site modern unde poți vorbi cu alți oameni într-o interfață premium, cu camere de chat, profiluri și notificări animate."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="background-glow glow-1"></div>
+    <div class="background-glow glow-2"></div>
+
+    <div id="authScreen" class="auth-screen">
+      <div class="auth-card">
+        <p class="eyebrow">Autentificare</p>
+        <h1>Intră în comunitatea TalkHive</h1>
+        <p class="auth-text">
+          Creează un cont sau autentifică-te. Conturile sunt salvate în baza de date locală a browserului și rămân după refresh.
+        </p>
+
+        <div class="auth-toggle" role="tablist" aria-label="Comutare autentificare">
+          <button class="mode-btn active" type="button" data-mode="login">Autentificare</button>
+          <button class="mode-btn" type="button" data-mode="register">Creare cont</button>
+        </div>
+
+        <button id="googleAuthBtn" class="google-btn" type="button">
+          <span class="google-icon">G</span>
+          Continuă cu Google
+        </button>
+
+        <div class="auth-divider"><span>sau</span></div>
+
+        <form id="loginForm" class="auth-form active-form">
+          <input id="loginEmailInput" type="email" placeholder="Email" required />
+          <input id="loginPasswordInput" type="password" placeholder="Parolă" required />
+          <button type="submit">Autentifică-te</button>
+        </form>
+
+        <form id="registerForm" class="auth-form hidden">
+          <input id="registerNameInput" type="text" placeholder="Numele tău" maxlength="24" required />
+          <input id="registerEmailInput" type="email" placeholder="Email" required />
+          <input id="registerPasswordInput" type="password" placeholder="Parolă" required />
+          <select id="registerStatusSelect">
+            <option value="online">Online</option>
+            <option value="studying">Studiez</option>
+            <option value="gaming">Gaming</option>
+            <option value="focus">În focus</option>
+          </select>
+          <select id="registerRoleSelect">
+            <option value="user">Utilizator</option>
+            <option value="owner">Owner</option>
+          </select>
+          <input id="registerOwnerPassword" class="hidden" type="password" placeholder="Parola" />
+          <button type="submit">Crează cont</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="appView" class="app-view hidden">
+      <header class="hero">
+        <nav class="nav-bar">
+          <div class="brand">TalkHive</div>
+          <div class="nav-actions">
+            <span id="userBadge" class="user-badge"></span>
+            <button id="logoutBtn" class="ghost-btn" type="button">Ieșire</button>
+          </div>
+        </nav>
+
+        <div class="hero-content">
+          <div class="hero-copy">
+            <p class="eyebrow">Chat social • Comunitate • La Lucii</p>
+            <h1>Conversații live, profiluri și camere dedicate.</h1>
+            <p class="hero-text">
+              Aici poți intra în chaturi separate, schimba profilul și primi notificări animate în timp real.
+            </p>
+          </div>
+
+          <div class="hero-card">
+            <div class="pill">Profil activ</div>
+            <h3 id="profileTitle">Utilizator nou</h3>
+            <p id="profileStatus" class="profile-status">Online</p>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section id="features" class="features">
+          <article class="feature-card">
+            <h3>🔐 Autentificare</h3>
+            <p>Fiecare utilizator are un profil personal și un status vizibil.</p>
+          </article>
+          <article class="feature-card">
+            <h3>💬 Camere separate</h3>
+            <p>General, Study și Gaming au conversații distincte și istorii proprii.</p>
+          </article>
+          <article class="feature-card">
+            <h3>🔔 Notificări</h3>
+            <p>Primești toast-uri animate și un sunet pentru fiecare mesaj nou.</p>
+          </article>
+        </section>
+
+        <section id="chat" class="chat-section">
+          <div class="chat-shell">
+            <aside class="sidebar">
+              <div class="sidebar-top">
+                <h2>Profil și camere</h2>
+                <p>Conectat acum în comunitate.</p>
+              </div>
+
+              <div class="profile-card">
+                <div id="avatarCircle" class="avatar-circle"></div>
+                <div>
+                  <strong id="profileName">Nume</strong>
+                  <p id="profileSubtitle">Status</p>
+                </div>
+              </div>
+
+              <div class="room-list" id="roomList"></div>
+
+              <div class="room-card">
+                <p>Camera activă</p>
+                <strong id="activeRoomName">General</strong>
+                <button id="joinBtn" type="button">Intră în cameră</button>
+              </div>
+
+              <div id="ownerPanel" class="moderation-panel hidden">
+                <h3>Moderare</h3>
+                <p>Mute, unmute, anunțuri și roluri pentru admini și owner.</p>
+
+                <div class="moderation-section">
+                  <h4>Mute / Unmute</h4>
+                  <input id="muteTargetInput" type="text" placeholder="Nume utilizator" />
+                  <select id="muteDurationSelect">
+                    <option value="600000">10 min</option>
+                    <option value="1800000">30 min</option>
+                    <option value="3600000">1 oră</option>
+                  </select>
+                  <div class="button-row">
+                    <button id="muteBtn" type="button">Mute</button>
+                    <button id="unmuteBtn" class="secondary-btn" type="button">Unmute</button>
+                  </div>
+                  <ul id="mutedList" class="moderation-list"></ul>
+                </div>
+
+                <div class="moderation-section">
+                  <h4>Anunț</h4>
+                  <textarea id="announcementInput" rows="3" placeholder="Scrie un anunț pentru chat..."></textarea>
+                  <button id="announceBtn" type="button">Trimite anunț</button>
+                </div>
+
+                <div class="moderation-section">
+                  <h4>Dă rol</h4>
+                  <input id="roleTargetInput" type="text" placeholder="Nume utilizator" />
+                  <select id="roleAssignSelect">
+                    <option value="helper">Helper</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                  <button id="assignRoleBtn" type="button">Aplică rol</button>
+                  <ul id="moderationUserList" class="moderation-list"></ul>
+                </div>
+
+                <div class="moderation-section">
+                  <h4>Blocare</h4>
+                  <input id="blockInput" type="text" placeholder="Nume utilizator" />
+                  <div class="button-row">
+                    <button id="blockBtn" type="button">Blochează</button>
+                    <button id="unblockBtn" class="secondary-btn" type="button">Deblochează</button>
+                  </div>
+                  <ul id="blockedList" class="moderation-list"></ul>
+                </div>
+              </div>
+            </aside>
+
+            <div class="chat-panel">
+              <div class="chat-header">
+                <div>
+                  <h3 id="roomHeading">General</h3>
+                  <p id="roomSubheading">Conversație activă • 3 camere disponibile</p>
+                </div>
+                <span class="live-badge">live</span>
+              </div>
+
+              <div id="messages" class="messages" aria-live="polite"></div>
+
+              <form id="chatForm" class="composer">
+                <input
+                  id="messageInput"
+                  type="text"
+                  placeholder="Scrie un mesaj în camera selectată..."
+                  autocomplete="off"
+                />
+                <div class="composer-tools">
+                  <input id="imageInput" type="file" accept="image/*" class="hidden" />
+                  <button id="imageBtn" class="secondary-btn" type="button">+ Poza</button>
+                  <button type="submit">Trimite</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

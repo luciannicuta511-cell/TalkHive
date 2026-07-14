@@ -48,6 +48,7 @@ const imageInput = document.getElementById('imageInput');
 const imageBtn = document.getElementById('imageBtn');
 
 const ownerPasswordValue = 'lucii12331233*';
+const sharedStateKey = 'talkhive-shared-state';
 
 const roomConfig = [
   { id: 'general', label: 'General', accent: '#7c5cff' },
@@ -179,8 +180,8 @@ function openDatabase() {
   return dbPromise;
 }
 
-function persistAppState() {
-  const payload = {
+function buildStatePayload() {
+  return {
     id: 'app',
     user: state.user,
     activeRoom: state.activeRoom,
@@ -190,7 +191,10 @@ function persistAppState() {
     announcements: state.announcements,
     users: state.users || []
   };
+}
 
+function persistAppState() {
+  const payload = buildStatePayload();
   localStorage.setItem(storageKeys.appState, JSON.stringify(payload));
   openDatabase()
     .then((db) => {
@@ -198,9 +202,24 @@ function persistAppState() {
       tx.objectStore('state').put(payload);
     })
     .catch(() => {});
+  localStorage.setItem(sharedStateKey, JSON.stringify(payload));
 }
 
-async function hydrateAppState() {
+function applyRemoteState(payload) {
+  if (!payload) return;
+  state.user = payload.user || null;
+  state.activeRoom = payload.activeRoom || 'general';
+  state.rooms = payload.rooms || loadRooms();
+  state.blockedUsers = payload.blockedUsers || loadBlockedUsers();
+  state.mutedUsers = payload.mutedUsers || loadMutedUsers();
+  state.announcements = payload.announcements || loadAnnouncements();
+  state.users = payload.users || loadUsers();
+  localStorage.setItem(storageKeys.appState, JSON.stringify(payload));
+  localStorage.setItem(sharedStateKey, JSON.stringify(payload));
+  render();
+}
+
+function hydrateAppState() {
   const localState = localStorage.getItem(storageKeys.appState);
   if (localState) {
     const parsed = JSON.parse(localState);
@@ -232,6 +251,22 @@ async function hydrateAppState() {
     };
   } catch (error) {
     console.warn('IndexedDB unavailable, using localStorage fallback.', error);
+  }
+
+  const sharedState = localStorage.getItem(sharedStateKey);
+  if (sharedState) {
+    applyRemoteState(JSON.parse(sharedState));
+  }
+}
+
+function refreshSharedState() {
+  const sharedState = localStorage.getItem(sharedStateKey);
+  if (sharedState) {
+    const payload = JSON.parse(sharedState);
+    const localPayload = buildStatePayload();
+    if (JSON.stringify(localPayload) !== JSON.stringify(payload)) {
+      applyRemoteState(payload);
+    }
   }
 }
 
@@ -730,3 +765,6 @@ if (savedUser) {
 }
 
 hydrateAppState();
+window.setInterval(() => {
+  refreshSharedState();
+}, 4000);
